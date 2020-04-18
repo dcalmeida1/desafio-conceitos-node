@@ -58,7 +58,8 @@ app.put("/repositories/:id", validateRepositoryId, (request, response) => {
     id,
     title,
     url,
-    techs
+    techs,
+    likes: repositories[repositoryIndex]["likes"]
   };
 
   repositories[repositoryIndex] = repositoryUpdated;
