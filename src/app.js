@@ -15,7 +15,7 @@ function validateRepositoryId(request, response, next) {
   const { id } = request.params;
 
   if (!isUuid(id)) {
-    return response.status(400).json({ message: "Invalid repository Id" });
+    return response.status(400).json({ error: "Invalid repository Id" });
   }
 
   return next();
@@ -24,7 +24,7 @@ function validateRepositoryId(request, response, next) {
 // app.use(validateRepositoryId);
 
 app.get("/repositories", (request, response) => {
-  response.json(repositories);
+  return response.json(repositories);
 });
 
 app.post("/repositories", (request, response) => {
@@ -41,18 +41,36 @@ app.post("/repositories", (request, response) => {
 
   repositories.push(repository);
 
-  response.status(200).json(repository);
+  return response.status(200).json(repository);
 });
 
-app.put("/repositories/:id", (request, response) => {
+app.put("/repositories/:id", validateRepositoryId, (request, response) => {
+  const { id } = request.params;
+  const { title, url, techs } = request.body;
+
+  const repositoryIndex = repositories.findIndex((respository) => respository.id === id);
+
+  if (repositoryIndex < 0) {
+    return response.status(400).json({ error: "Repository not found" });
+  }
+
+  const repositoryUpdated = {
+    id,
+    title,
+    url,
+    techs
+  };
+
+  repositories[repositoryIndex] = repositoryUpdated;
+
+  return response.json(repositoryUpdated);
+});
+
+app.delete("/repositories/:id", validateRepositoryId, (request, response) => {
   // TODO
 });
 
-app.delete("/repositories/:id", (request, response) => {
-  // TODO
-});
-
-app.post("/repositories/:id/like", (request, response) => {
+app.post("/repositories/:id/like", validateRepositoryId, (request, response) => {
   // TODO
 });
 
